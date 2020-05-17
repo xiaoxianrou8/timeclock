@@ -1,0 +1,9 @@
+/bin/
+/Debug/
+/Release/
+/packages/
+*/bin/
+*/Debug/
+*/Release/
+*/packages/
+/.vs/

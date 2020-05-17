@@ -1,0 +1,110 @@
+﻿<Window x:Class="TimeClock.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TimeClock"
+        xmlns:converter="clr-namespace:TimeClock.converter"
+        x:Name="TimeWindow" 
+        mc:Ignorable="d" MouseLeftButtonDown="DragWindow" Topmost="False"
+        Title="MainWindow" Height="510" Width="510" WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize" WindowStyle="None" AllowsTransparency="True" Opacity="1" Background="{x:Null}" ShowInTaskbar="False">
+    <Window.Resources>
+        <RoutedUICommand x:Key="Close" Text="关闭" />
+        <converter:HourConverter x:Key="hourConverter"/>
+        <converter:MinuteConverter x:Key="minuteConverter"/>
+        <Storyboard x:Key="secondStory">
+            <DoubleAnimation Storyboard.TargetProperty="Angle" From="0" To="360" RepeatBehavior="Forever" Duration="0:1:0" By="6" Storyboard.TargetName="secondRotate"/>
+        </Storyboard>
+        <!--锁定样式-->
+        <Style x:Key="LockStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="#FF00ACAC"/>
+            <Setter Property="Background" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="8" Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter Property="Background" Value="#55D4D4D4"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Gesture="Alt+C" Command="{StaticResource Close}" />
+    </Window.InputBindings>
+    <Window.CommandBindings>
+        <CommandBinding Command="{StaticResource Close}" Executed="close_Window" CanExecute="canClose_Window"/>
+    </Window.CommandBindings>
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="Window.Loaded" SourceName="TimeWindow">
+            <BeginStoryboard Storyboard="{StaticResource secondStory}"/>
+        </EventTrigger>
+    </Window.Triggers>
+
+    <Grid Margin="10">
+        <Image Source="/image/椭圆 5.png" Height="400" Width="400"/>
+        <Image Source="/image/年份.png" Height="190" Width="190"/>
+        <Image x:Name="second" Source="/image/秒盘.png" Height="365" Width="365" RenderTransformOrigin="0.5,0.5">
+            <Image.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform x:Name="secondRotate" Angle="18.245"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Image.RenderTransform>
+        </Image>
+        <Image x:Name="min" Source="/image/分轮盘.png" RenderTransformOrigin="0.5,0.5">
+            <Image.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="{Binding Minute,Converter={StaticResource minuteConverter}}"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Image.RenderTransform>
+        </Image>
+        <Image x:Name="hour" Source="/image/时数导出.png" Height="320" Width="320" RenderTransformOrigin="0.5,0.5">
+            <Image.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="{Binding Hour,Converter={StaticResource hourConverter}}"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Image.RenderTransform>
+        </Image>
+
+        <Image Source="/image/外指针导出.png"/>
+        <Grid Margin="150">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="25"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Bottom" Orientation="Vertical">
+                <TextBlock Text="{Binding Week}" HorizontalAlignment="Center" FontSize="30"/>
+                <Separator Background="White" Width="150" Height="10"/>
+            </StackPanel>
+            <TextBlock Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                   FontSize="25" Foreground="White" Text="{Binding ShortDate}" FontFamily="Arial Black"/>
+            <StackPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Top" Orientation="Vertical">
+                <Separator Background="White" Width="150" Height="10"/>
+                <TextBlock Text="{Binding LongLi}" HorizontalAlignment="Center" FontSize="10" FontFamily="楷体" Foreground="White"/>
+                <TextBlock Text="{Binding DateNow}" HorizontalAlignment="Center" FontSize="25" Foreground="White" FontFamily="hooge 05_53"/>
+            </StackPanel>
+        </Grid>
+        <!--锁定时钟-->
+        <Canvas>
+            <Button Name="Locker" Style="{StaticResource LockStyle}" Click="Locker_Click" Canvas.Right="0" Content="&#xE1F6;" FontSize="20" FontFamily="Segoe MDL2 Assets" Height="30" Width="30"/>
+        </Canvas>
+
+    </Grid>
+</Window>
